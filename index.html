@@ -24,6 +24,11 @@
 
 
     <script>
+
+        const singleLegData = [
+            { xOffset: 4, yOffset: 0, tOffset: 0, color: "red" },
+        ]
+
         const singleLegSequence = [
             [0, 0, 0],
             [0, 0, .25],
@@ -85,10 +90,14 @@
                     <svg viewBox="-10 -10 20 20" width="200" height="200">
                         <circle r="1" cx="0" cy="0" stroke="light-dark(black, white)" fill="none" stroke-width="0.25">
                         </circle>
-                        <circle data-attr-cx="3+singleLegSequence[$singleT%singleLegSequence.length][0]"
-                            data-attr-cy="singleLegSequence[$singleT%singleLegSequence.length][1]"
-                            data-attr-r="0.5+singleLegSequence[$singleT%singleLegSequence.length][2]" fill="red">
-                        </circle>
+                        <circle
+                        data-attr-cx="singleLegData[0].xOffset+singleLegSequence[($singleT + singleLegData[0].tOffset)%singleLegSequence.length][0]"
+                        data-attr-cy="singleLegData[0].yOffset+singleLegSequence[($singleT + singleLegData[0].tOffset)%singleLegSequence.length][1]"
+                        data-attr-r="0.5+singleLegSequence[($singleT + singleLegData[0].tOffset)%singleLegSequence.length][2]"
+                        data-attr-fill="singleLegSequence[($singleT + singleLegData[0].tOffset)%singleLegSequence.length][2] > 0 ? 'none' : singleLegData[0].color"
+                        data-attr-stroke="singleLegData[0].color"
+                        stroke-width="0.25"></circle>
+                        
                     </svg>
                     <button data-on-click="$singleLegEnabled = !$singleLegEnabled"><span
                             data-text="$singleLegEnabled ? 'Stop' : 'Start'"></span> Animation</button>
