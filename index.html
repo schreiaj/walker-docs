@@ -97,22 +97,17 @@
     <main class="container">
         <section id="intro">
             <p>
-                There are a lot of different ways to control legs for a walking robot. The simplest approach is to just
-                have each leg attempt to run a gait sequence. The big downside - it has no idea what surface it is on so
-                over uneven terrain it will struggle. But for getting something moving and simple teleoperated robots
-                this approach is likely adequate to start.
+                There are many different ways to control legs for a walking robot. The simplest approach is to have each leg follow a repeating pattern called a gait sequence. The main downside is that the robot doesn't know what surface it's walking on, so it will struggle over uneven terrain. But for getting a robot moving and for simple remote-controlled robots, this approach works well to start with.
             </p>
         </section>
         <!-- Preview -->
         <section id="single-leg">
-            <h2>We're going to start with a single leg</h2>
+            <h2>Let's start with a single leg</h2>
             <p>
-                More specifically, we're going to look at the target for the leg. Getting the leg to move to the target
-                is called inverse kinematics and is a different topic.
+                We're going to look at where the leg should move to. Getting the leg to actually move to that target is called inverse kinematics, which is a different topic.
             </p>
             <p>
-                Below you'll see a red circle representing the target for the leg and a black circle representing the
-                body.
+                Below you'll see a red circle representing where the leg should move and a black circle representing the robot's body.
             </p>
             <div data-signals="{singleT: 0, singleLegEnabled: false}"
                 data-on-interval__duration.200ms="$singleLegEnabled && $singleT++">
@@ -134,24 +129,23 @@
                 </div>
                 There are 4 distinct phases to the leg's movement:
                 <ol>
-                    <li>Lift - the leg lifts from the ground</li>
-                    <li>Swing - the leg swings out in the direction of travel</li>
-                    <li>Land - the leg lands on the ground</li>
-                    <li>Retract - the leg retracts back away from the direction of travel</li>
+                    <li><strong>Lift</strong> - the leg lifts from the ground</li>
+                    <li><strong>Swing</strong> - the leg swings forward in the direction of travel</li>
+                    <li><strong>Land</strong> - the leg lands on the ground</li>
+                    <li><strong>Retract</strong> - the leg pulls back toward the body</li>
                 </ol>
-                You'll notice, the circle representing the leg increases in diameter as it moves up in Z. This is just a
-                visual effect because we're working in 2d.
+                <p>You'll notice the circle representing the leg gets bigger when it's in the air. This is just a visual effect since we're working in 2D.</p>
             </div>
 
         </section>
 
         <section id="single-leg">
-            <h2>Now let's add the other legs</h2>
+            <h2>And some more legs...</h2>
             <p>
-                We're going to start with 4 legs because it's easier to see what's going on with fewer legs
+                We're going to start with 4 legs because it's easier to see what's happening with fewer legs.
             </p>
             <p>
-                Now we've added 3 more legs and are running the same gait sequence on each leg.
+                Now we've added 3 more legs and are running the same movement pattern on each leg.
             </p>
             <div
                 data-signals="{fourLegNoOffsetT: 0, fourLegNoOffsetEnabled: false, fourLegOffsetT: 0, fourLegOffsetEnabled: false}">
@@ -189,20 +183,13 @@
                     <button data-on-click="$fourLegNoOffsetEnabled = !$fourLegNoOffsetEnabled"><span
                             data-text="$fourLegNoOffsetEnabled ? 'Stop' : 'Start'"></span> Animation</button>
                 </div>
-                <p>You've probably just had the thought that the robot would just be moving in a circle with not actual
-                    locomotion. We can fix that issue by adding an offset to the step each leg is doing. This will get
-                    them to move in sequence.</p>
+                <p>You might have noticed that the robot would just be moving in a circle without actually going anywhere. We can fix this by adding time offsets to each leg's movement pattern. This makes the legs move in sequence instead of all at once.</p>
 
-                <p>However, it does add a new requirement to our gait sequence. The retract phase needes to be longer
-                    than the other phases.
-                <p>How much longer depends on what sort of gait you're doing. For the simplest lift one leg at a time
-                    gait we're going to do you need to make sure that when any one leg is in the air the remaining legs
-                    are on the ground.
-                <p>
-                    We've tried to make it clear when those steps are happening by making the leg targets unfilled when
-                    they should be in the air. Now let's see if we can tweak the gaint sequence and add offsets
-                    appropriately.
-                </p>
+                <p>However, this adds a new requirement to our movement pattern. The retract phase needs to be longer than the other phases.</p>
+                
+                <p>How much longer depends on what type of walking pattern you're using. For the simplest "lift one leg at a time" pattern, you need to make sure that when any one leg is in the air, the remaining legs are on the ground.</p>
+                
+                <p>We've made it clear when the legs are in the air by making the circles unfilled. Now let's see if we can adjust the movement pattern and add the right time offsets.</p>
 
 
                 <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 10px;"
@@ -245,13 +232,10 @@
         <section id="changing-directions">
             <h2>Crab Walking</h2>
             <p>
-                Ok, ok, that is all great if we want to just walk in a straight line in one direction at a constant
-                speed but what if we want to go in different directions or change speed?
+                Great! That works well for walking in a straight line at a constant speed. But what if we want to go in different directions or change speed?
             </p>
             <p>
-                Well, if we view each step of the gait as an offset from the resting position of the leg we can fairly
-                trivially rotate that position around to move in a different direction and then we can scale the offset
-                based on the speed..
+                If we think of each step as an offset from the leg's resting position, we can rotate that offset to move in a different direction. We can also scale the offset based on speed.
             </p>
             <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 10px;"
                 data-signals="{fourLegSteeringT: 0, fourLegSteeringEnabled: false, fourLegSteeringAngle: 3.14, fourLegSteeringSpeed: 0}"
@@ -302,66 +286,22 @@
                 <button data-on-click="$fourLegSteeringEnabled = !$fourLegSteeringEnabled"><span
                         data-text="$fourLegSteeringEnabled ? 'Stop' : 'Start'"></span> Animation</button>
             </div>
-            <p>We can achieve this by treating the target position as a vector and rotating it about the center of the
-                robot. Which sounds complicated but is actually pretty simple, set the x component to <math>
-                    <msub>
-                        <mi>x</mi>
-                        <mi>new</mi>
-                    </msub>
-                    <mo>=</mo>
-                    <mi>x</mi>
-                    <mo>⋅</mo>
-                    <mi>cos</mi>
-                    <mo>(</mo>
-                    <mi>θ</mi>
-                    <mo>)</mo>
-                    <mo>-</mo>
-                    <mi>y</mi>
-                    <mo>⋅</mo>
-                    <mi>sin</mi>
-                    <mo>(</mo>
-                    <mi>θ</mi>
-                    <mo>)</mo>
-                </math> and the y component to <math>
-                    <msub>
-                        <mi>y</mi>
-                        <mi>new</mi>
-                    </msub>
-                    <mo>=</mo>
-                    <mi>x</mi>
-                    <mo>⋅</mo>
-                    <mi>sin</mi>
-                    <mo>(</mo>
-                    <mi>θ</mi>
-                    <mo>)</mo>
-                    <mo>+</mo>
-                    <mi>y</mi>
-                    <mo>⋅</mo>
-                    <mi>cos</mi>
-                    <mo>(</mo>
-                    <mi>θ</mi>
-                    <mo>)</mo>
-                </math>.</p>
-            <p>
-                We can also scale the speed by multiplying the offset by the speed.
-            </p>
+            <p>We can do this by treating the target position as a vector and rotating it around the center of the robot. This sounds complicated but is actually pretty simple. We use these formulas:</p>
+            
+            <p><strong>New X = X × cos(angle) - Y × sin(angle)</strong></p>
+            <p><strong>New Y = X × sin(angle) + Y × cos(angle)</strong></p>
+            
+            <p>We can also change the speed by multiplying the offset by the speed value.</p>
         </section>
         <section id="turning">
             <h2>Turning</h2>
             <p>
-                Presumably we also want to be able to turn, it would be a pretty boring robot if we couldn't do that.
-                So, let's think about how we turn a differential drive robot, the left side and the right side move at
-                different rates. Well, we can vary the speed of all the legs, what would happen if we did that for
-                individual legs?
+                We also want to be able to turn - it would be a pretty boring robot if we couldn't do that! Let's think about how a differential drive robot turns: the left side and the right side move at different speeds. We can do the same thing with legs by varying the speed of individual legs.
             </p>
             <p>
-                Unfortunately, this is a bit more complicated because we do care about where the leg is in relation to
-                the desired translation and this requires a bit of math.
+                This is a bit more complicated because we need to know where each leg is in relation to the direction we want to turn.
             </p>
-            <p>We're going to use the angle between the leg and the steering vector (which is just a line pointing in
-                the direction we want to turn) to compute if the leg is on the inside or the outside of the robot for
-                the desired turn. Then simply add or subtract the desired angular velocity depending on inside or
-                outside.</p>
+            <p>We use the angle between the leg and the direction we want to turn to figure out if the leg is on the inside or outside of the turn. Then we add or subtract the turning speed depending on whether the leg is on the inside or outside.</p>
             <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 10px;"
                 data-signals="{fourLegTurningT: 0, fourLegTurningEnabled: false, fourLegTurningAngle: 3.14, fourLegTurningSpeed: 0, fourLegTurningSteer: 0}"
                 data-on-interval__duration.200ms="$fourLegTurningEnabled && $fourLegTurningT++">
