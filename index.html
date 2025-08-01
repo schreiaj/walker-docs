@@ -86,18 +86,17 @@
             <div data-signals="{singleT: 0, singleLegEnabled: false}"
                 data-on-interval__duration.200ms="$singleLegEnabled && $singleT++">
 
-                <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 10px;">
                     <svg viewBox="-10 -10 20 20" width="200" height="200">
                         <circle r="1" cx="0" cy="0" stroke="light-dark(black, white)" fill="none" stroke-width="0.25">
                         </circle>
                         <circle
-                        data-attr-cx="singleLegData[0].xOffset+singleLegSequence[($singleT + singleLegData[0].tOffset)%singleLegSequence.length][0]"
-                        data-attr-cy="singleLegData[0].yOffset+singleLegSequence[($singleT + singleLegData[0].tOffset)%singleLegSequence.length][1]"
-                        data-attr-r="0.5+singleLegSequence[($singleT + singleLegData[0].tOffset)%singleLegSequence.length][2]"
-                        data-attr-fill="singleLegSequence[($singleT + singleLegData[0].tOffset)%singleLegSequence.length][2] > 0 ? 'none' : singleLegData[0].color"
-                        data-attr-stroke="singleLegData[0].color"
-                        stroke-width="0.25"></circle>
-                        
+                            data-attr-cx="singleLegData[0].xOffset+singleLegSequence[($singleT + singleLegData[0].tOffset)%singleLegSequence.length][0]"
+                            data-attr-cy="singleLegData[0].yOffset+singleLegSequence[($singleT + singleLegData[0].tOffset)%singleLegSequence.length][1]"
+                            data-attr-r="0.5+singleLegSequence[($singleT + singleLegData[0].tOffset)%singleLegSequence.length][2]"
+                            data-attr-fill="singleLegSequence[($singleT + singleLegData[0].tOffset)%singleLegSequence.length][2] > 0 ? 'none' : singleLegData[0].color"
+                            data-attr-stroke="singleLegData[0].color" stroke-width="0.25"></circle>
+
                     </svg>
                     <button data-on-click="$singleLegEnabled = !$singleLegEnabled"><span
                             data-text="$singleLegEnabled ? 'Stop' : 'Start'"></span> Animation</button>
@@ -126,7 +125,7 @@
             <div
                 data-signals="{fourLegNoOffsetT: 0, fourLegNoOffsetEnabled: false, fourLegOffsetT: 0, fourLegOffsetEnabled: false}">
 
-                <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;"
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 10px;"
                     data-on-interval__duration.200ms="$fourLegNoOffsetEnabled && $fourLegNoOffsetT++"">
                     <svg viewBox=" -10 -10 20 20" width="200" height="200">
                     <circle r="1" cx="0" cy="0" stroke="light-dark(black, white)" fill="none" stroke-width="0.25">
@@ -175,7 +174,7 @@
                 </p>
 
 
-                <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;"
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 10px;"
                     data-on-interval__duration.200ms="$fourLegOffsetEnabled && $fourLegOffsetT++">
                     <svg viewBox="-10 -10 20 20" width="200" height="200">
                         <circle r="1" cx="0" cy="0" stroke="light-dark(black, white)" fill="none" stroke-width="0.25">
@@ -198,7 +197,8 @@
                             data-attr-r="0.5+fourLegOffsetSequence[($fourLegOffsetT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][2]"
                             data-attr-fill="fourLegOffsetSequence[($fourLegOffsetT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][2] > 0 ? 'none' : fourLegOffsetData[2].color"
                             data-attr-stroke="fourLegOffsetData[2].color" stroke-width="0.25"></circle>
-                        <circle data-attr-cx="fourLegOffsetData[3].xOffset+fourLegOffsetSequence[($fourLegOffsetT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][0]"
+                        <circle
+                            data-attr-cx="fourLegOffsetData[3].xOffset+fourLegOffsetSequence[($fourLegOffsetT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][0]"
                             data-attr-cy="fourLegOffsetData[3].yOffset+fourLegOffsetSequence[($fourLegOffsetT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][1]"
                             data-attr-r="0.5+fourLegOffsetSequence[($fourLegOffsetT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][2]"
                             data-attr-fill="fourLegOffsetSequence[($fourLegOffsetT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][2] > 0 ? 'none' : fourLegOffsetData[3].color"
@@ -206,18 +206,176 @@
                     </svg>
                     <button data-on-click="$fourLegOffsetEnabled = !$fourLegOffsetEnabled"><span
                             data-text="$fourLegOffsetEnabled ? 'Stop' : 'Start'"></span> Animation</button>
-                    
+
                 </div>
             </div>
 
         </section>
-        <!-- ./ Loading -->
+        <section id="changing-directions">
+            <h2>Crab Walking</h2>
+            <p>
+                Ok, ok, that is all great if we want to just walk in a straight line in one direction at a constant
+                speed but what if we want to go in different directions or change speed?
+            </p>
+            <p>
+                Well, if we view each step of the gait as an offset from the resting position of the leg we can fairly
+                trivially rotate that position around to move in a different direction and then we can scale the offset
+                based on the speed..
+            </p>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 10px;"
+                data-signals="{fourLegSteeringT: 0, fourLegSteeringEnabled: false, fourLegSteeringAngle: 3.14, fourLegSteeringSpeed: 0}"
+                data-on-interval__duration.200ms="$fourLegSteeringEnabled && $fourLegSteeringT++">
+                <svg viewBox="-10 -10 20 20" width="200" height="200">
+                    <circle r="1" cx="0" cy="0" stroke="light-dark(black, white)" fill="none" stroke-width="0.25">
+                    </circle>
+                    <circle
+                        data-attr-cx="fourLegOffsetData[0].xOffset+$fourLegSteeringSpeed*Math.cos($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[0].tOffset)%fourLegOffsetSequence.length][0]-Math.sin($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[0].tOffset)%fourLegOffsetSequence.length][1]"
+                        data-attr-cy="fourLegOffsetData[0].yOffset+$fourLegSteeringSpeed*Math.sin($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[0].tOffset)%fourLegOffsetSequence.length][0]+Math.cos($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[0].tOffset)%fourLegOffsetSequence.length][1]"
+                        data-attr-r="0.5+fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[0].tOffset)%fourLegOffsetSequence.length][2]"
+                        data-attr-fill="fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[0].tOffset)%fourLegOffsetSequence.length][2] > 0 ? 'none' : fourLegOffsetData[0].color"
+                        data-attr-stroke="fourLegOffsetData[0].color" stroke-width="0.25"></circle>
+                    <circle
+                        data-attr-cx="fourLegOffsetData[1].xOffset+$fourLegSteeringSpeed*Math.cos($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[1].tOffset)%fourLegOffsetSequence.length][0]-Math.sin($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[1].tOffset)%fourLegOffsetSequence.length][1]"
+                        data-attr-cy="fourLegOffsetData[1].yOffset+$fourLegSteeringSpeed*Math.sin($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[1].tOffset)%fourLegOffsetSequence.length][0]+Math.cos($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[1].tOffset)%fourLegOffsetSequence.length][1]"
+                        data-attr-r="0.5+fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[1].tOffset)%fourLegOffsetSequence.length][2]"
+                        data-attr-fill="fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[1].tOffset)%fourLegOffsetSequence.length][2] > 0 ? 'none' : fourLegOffsetData[1].color"
+                        data-attr-stroke="fourLegOffsetData[1].color" stroke-width="0.25"></circle>
+                    <circle
+                        data-attr-cx="fourLegOffsetData[2].xOffset+$fourLegSteeringSpeed*Math.cos($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][0]-Math.sin($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][1]"
+                        data-attr-cy="fourLegOffsetData[2].yOffset+$fourLegSteeringSpeed*Math.sin($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][0]+Math.cos($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][1]"
+                        data-attr-r="0.5+fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][2]"
+                        data-attr-fill="fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][2] > 0 ? 'none' : fourLegOffsetData[2].color"
+                        data-attr-stroke="fourLegOffsetData[2].color" stroke-width="0.25"></circle>
+                    <circle
+                        data-attr-cx="fourLegOffsetData[3].xOffset+$fourLegSteeringSpeed*Math.cos($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][0]-Math.sin($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][1]"
+                        data-attr-cy="fourLegOffsetData[3].yOffset+$fourLegSteeringSpeed*Math.sin($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][0]+Math.cos($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][1]"
+                        data-attr-r="0.5+fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][2]"
+                        data-attr-fill="fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][2] > 0 ? 'none' : fourLegOffsetData[3].color"
+                        data-attr-stroke="fourLegOffsetData[3].color" stroke-width="0.25"></circle>
+                    <!-- Let's add a line from the center into the direction of travel -->
+                    <path
+                        data-attr-d="`M 0 0 L ${3*$fourLegSteeringSpeed*Math.cos($fourLegSteeringAngle)} ${3*$fourLegSteeringSpeed*Math.sin($fourLegSteeringAngle)}`"
+                        data-attr-stroke="$fourLegSteeringSpeed >= 0 ? 'black' : 'red'"
+                        stroke="light-dark(black, white)" opacity=".75" stroke-width=".25" fill="none"></path>
+                </svg>
+                <div style="width: 200px">
+                    <label for="direction-input">Direction</label>
+                    <input id="direction-input" type="range" data-bind-four-leg-steering-angle min="0" max="6.28"
+                        step="0.01">
+                </div>
+                <div style="width: 200px">
+                    <label for="direction-input">Speed</label>
+                    <input id="direction-input" type="range" data-bind-four-leg-steering-speed min="-1" max="1"
+                        step="0.1">
+                </div>
+                <button data-on-click="$fourLegSteeringEnabled = !$fourLegSteeringEnabled"><span
+                        data-text="$fourLegSteeringEnabled ? 'Stop' : 'Start'"></span> Animation</button>
+            </div>
+            <p>We can achieve this by treating the target position as a vector and rotating it about the center of the
+                robot. Which sounds complicated but is actually pretty simple, set the x component to <math>
+                    <msub>
+                        <mi>x</mi>
+                        <mi>new</mi>
+                    </msub>
+                    <mo>=</mo>
+                    <mi>x</mi>
+                    <mo>⋅</mo>
+                    <mi>cos</mi>
+                    <mo>(</mo>
+                    <mi>θ</mi>
+                    <mo>)</mo>
+                    <mo>-</mo>
+                    <mi>y</mi>
+                    <mo>⋅</mo>
+                    <mi>sin</mi>
+                    <mo>(</mo>
+                    <mi>θ</mi>
+                    <mo>)</mo>
+                </math> and the y component to <math>
+                    <msub>
+                        <mi>y</mi>
+                        <mi>new</mi>
+                    </msub>
+                    <mo>=</mo>
+                    <mi>x</mi>
+                    <mo>⋅</mo>
+                    <mi>sin</mi>
+                    <mo>(</mo>
+                    <mi>θ</mi>
+                    <mo>)</mo>
+                    <mo>+</mo>
+                    <mi>y</mi>
+                    <mo>⋅</mo>
+                    <mi>cos</mi>
+                    <mo>(</mo>
+                    <mi>θ</mi>
+                    <mo>)</mo>
+                </math>.</p>
+            <p>
+                We can also scale the speed by multiplying the offset by the speed.
+            </p>
+        </section>
+        <!-- <section id="turning">
+            <h2>Turning</h2>
+            <p>
+                Presumably we also want to be able to turn, it would be a pretty boring robot if we couldn't do that. So, let's think about how we turn a differential drive robot, the left side and the right side move at different rates. Well, we can vary the speed of all the legs, what would happen if we did that for individual legs?
+            </p>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 10px;"
+                data-signals="{fourLegTurningT: 0, fourLegTurningEnabled: false, fourLegTurningAngle: 3.14, fourLegTurningSpeed: 0}"
+                data-on-interval__duration.200ms="$fourLegTurningEnabled && $fourLegTurningT++">
+                <svg viewBox="-10 -10 20 20" width="200" height="200">
+                    <circle r="1" cx="0" cy="0" stroke="light-dark(black, white)" fill="none" stroke-width="0.25">
+                    </circle>
+                    <circle
+                        data-attr-cx="fourLegOffsetData[0].xOffset+$fourLegTurningSpeed*Math.cos($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[0].tOffset)%fourLegOffsetSequence.length][0]-Math.sin($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[0].tOffset)%fourLegOffsetSequence.length][1]"
+                        data-attr-cy="fourLegOffsetData[0].yOffset+$fourLegTurningSpeed*Math.sin($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[0].tOffset)%fourLegOffsetSequence.length][0]+Math.cos($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[0].tOffset)%fourLegOffsetSequence.length][1]"
+                        data-attr-r="0.5+fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[0].tOffset)%fourLegOffsetSequence.length][2]"
+                        data-attr-fill="fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[0].tOffset)%fourLegOffsetSequence.length][2] > 0 ? 'none' : fourLegOffsetData[0].color"
+                        data-attr-stroke="fourLegOffsetData[0].color" stroke-width="0.25"></circle>
+                    <circle
+                        data-attr-cx="fourLegOffsetData[1].xOffset+$fourLegTurningSpeed*Math.cos($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[1].tOffset)%fourLegOffsetSequence.length][0]-Math.sin($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[1].tOffset)%fourLegOffsetSequence.length][1]"
+                        data-attr-cy="fourLegOffsetData[1].yOffset+$fourLegTurningSpeed*Math.sin($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[1].tOffset)%fourLegOffsetSequence.length][0]+Math.cos($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[1].tOffset)%fourLegOffsetSequence.length][1]"
+                        data-attr-r="0.5+fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[1].tOffset)%fourLegOffsetSequence.length][2]"
+                        data-attr-fill="fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[1].tOffset)%fourLegOffsetSequence.length][2] > 0 ? 'none' : fourLegOffsetData[1].color"
+                        data-attr-stroke="fourLegOffsetData[1].color" stroke-width="0.25"></circle>
+                    <circle
+                        data-attr-cx="fourLegOffsetData[2].xOffset+$fourLegTurningSpeed*Math.cos($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][0]-Math.sin($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][1]"
+                        data-attr-cy="fourLegOffsetData[2].yOffset+$fourLegTurningSpeed*Math.sin($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][0]+Math.cos($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][1]"
+                        data-attr-r="0.5+fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][2]"
+                        data-attr-fill="fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][2] > 0 ? 'none' : fourLegOffsetData[2].color"
+                        data-attr-stroke="fourLegOffsetData[2].color" stroke-width="0.25"></circle>
+                    <circle
+                        data-attr-cx="fourLegOffsetData[3].xOffset+$fourLegTurningSpeed*Math.cos($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][0]-Math.sin($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][1]"
+                        data-attr-cy="fourLegOffsetData[3].yOffset+$fourLegTurningSpeed*Math.sin($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][0]+Math.cos($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][1]"
+                        data-attr-r="0.5+fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][2]"
+                        data-attr-fill="fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][2] > 0 ? 'none' : fourLegOffsetData[3].color"
+                        data-attr-stroke="fourLegOffsetData[3].color" stroke-width="0.25"></circle>
+                    <path
+                        data-attr-d="`M 0 0 L ${3*$fourLegTurningSpeed*Math.cos($fourLegTurningAngle)} ${3*$fourLegTurningSpeed*Math.sin($fourLegTurningAngle)}`"
+                        data-attr-stroke="$fourLegTurningSpeed >= 0 ? 'black' : 'red'"
+                        stroke="light-dark(black, white)" opacity=".75" stroke-width=".25" fill="none"></path>
+                </svg>
+                <div style="width: 200px">
+                    <label for="direction-input">Direction</label>
+                    <input id="direction-input" type="range" data-bind-four-leg-turning-angle min="0" max="6.28"
+                        step="0.01">
+                </div>
+                <div style="width: 200px">
+                    <label for="direction-input">Speed</label>
+                    <input id="direction-input" type="range" data-bind-four-leg-turning-speed min="-1" max="1"
+                        step="0.1">
+                </div>
+                <button data-on-click="$fourLegTurningEnabled = !$fourLegTurningEnabled"><span
+                        data-text="$fourLegTurningEnabled ? 'Stop' : 'Start'"></span> Animation</button>
+            </div>
+        </section> -->
     </main>
     <!-- ./ Main -->
 
     <!-- Footer -->
     <footer class="container">
-        <small>Built by hand with <a href="https://data-star.dev/">DataStar</a> and <a href="https://picocss.com">Pico</a></small>
+        <small>Built by hand with <a href="https://data-star.dev/">DataStar</a> and <a
+                href="https://picocss.com">Pico</a></small>
     </footer>
     <!-- ./ Footer -->
 
