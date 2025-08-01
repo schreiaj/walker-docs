@@ -61,6 +61,37 @@
             [0.5, 0, 0],
             [0, 0, 0],
         ]
+
+        const computeLegTarget = (leg, t, speed, heading, angularRate, gaitSequence) => {
+            const { xOffset, yOffset, tOffset } = leg;
+            const gaitIndex = gaitSequence[(t + tOffset) % gaitSequence.length];
+
+            // Determine if the leg is on the right or left side relative to the heading direction
+            // Project the leg position onto the perpendicular to the heading direction
+            const perpX = -Math.sin(heading);
+            const perpY = Math.cos(heading);
+            const dotProduct = xOffset * perpX + yOffset * perpY;
+            const isRight = dotProduct > 0;
+
+            // Apply differential steering by scaling the speed based on leg position
+            // The angular rate creates a turning radius - inside legs move slower, outside legs move faster
+            // When speed=0 and angularRate>0, inside legs move backward (turning in place)
+            // When speed>0 and angularRate>0, inside legs move slower but still forward (turning while moving)
+            const effectiveSpeed = speed + (isRight ? -angularRate : +angularRate);
+
+            // Apply the heading rotation to the gait sequence
+            const xGait = Math.cos(heading) * gaitIndex[0] - Math.sin(heading) * gaitIndex[1];
+            const yGait = Math.sin(heading) * gaitIndex[0] + Math.cos(heading) * gaitIndex[1];
+
+            // Apply the effective speed to the gait sequence
+            const x = xOffset + effectiveSpeed * xGait;
+            const y = yOffset + effectiveSpeed * yGait;
+            const z = gaitIndex[2];
+
+            return { x, y, z, isRight }
+        }
+
+
     </script>
     <!-- Main -->
     <main class="container">
@@ -180,28 +211,28 @@
                         <circle r="1" cx="0" cy="0" stroke="light-dark(black, white)" fill="none" stroke-width="0.25">
                         </circle>
                         <circle
-                            data-attr-cx="fourLegOffsetData[0].xOffset+fourLegOffsetSequence[($fourLegOffsetT + fourLegOffsetData[0].tOffset)%fourLegOffsetSequence.length][0]"
-                            data-attr-cy="fourLegOffsetData[0].yOffset+fourLegOffsetSequence[($fourLegOffsetT + fourLegOffsetData[0].tOffset)%fourLegOffsetSequence.length][1]"
-                            data-attr-r="0.5+fourLegOffsetSequence[($fourLegOffsetT + fourLegOffsetData[0].tOffset)%fourLegOffsetSequence.length][2]"
-                            data-attr-fill="fourLegOffsetSequence[($fourLegOffsetT + fourLegOffsetData[0].tOffset)%fourLegOffsetSequence.length][2] > 0 ? 'none' : fourLegOffsetData[0].color"
+                            data-attr-cx="computeLegTarget(fourLegOffsetData[0], $fourLegOffsetT, 1, 0, 0, fourLegOffsetSequence).x"
+                            data-attr-cy="computeLegTarget(fourLegOffsetData[0], $fourLegOffsetT, 1, 0, 0, fourLegOffsetSequence).y"
+                            data-attr-r="0.5+computeLegTarget(fourLegOffsetData[0], $fourLegOffsetT, 1, 0, 0, fourLegOffsetSequence).z"
+                            data-attr-fill="computeLegTarget(fourLegOffsetData[0], $fourLegOffsetT, 1, 0, 0, fourLegOffsetSequence).z > 0 ? 'none' : fourLegOffsetData[0].color"
                             data-attr-stroke="fourLegOffsetData[0].color" stroke-width="0.25"></circle>
                         <circle
-                            data-attr-cx="fourLegOffsetData[1].xOffset+fourLegOffsetSequence[($fourLegOffsetT + fourLegOffsetData[1].tOffset)%fourLegOffsetSequence.length][0]"
-                            data-attr-cy="fourLegOffsetData[1].yOffset+fourLegOffsetSequence[($fourLegOffsetT + fourLegOffsetData[1].tOffset)%fourLegOffsetSequence.length][1]"
-                            data-attr-r="0.5+fourLegOffsetSequence[($fourLegOffsetT + fourLegOffsetData[1].tOffset)%fourLegOffsetSequence.length][2]"
-                            data-attr-fill="fourLegOffsetSequence[($fourLegOffsetT + fourLegOffsetData[1].tOffset)%fourLegOffsetSequence.length][2] > 0 ? 'none' : fourLegOffsetData[1].color"
+                            data-attr-cx="computeLegTarget(fourLegOffsetData[1], $fourLegOffsetT, 1, 0, 0, fourLegOffsetSequence).x"
+                            data-attr-cy="computeLegTarget(fourLegOffsetData[1], $fourLegOffsetT, 1, 0, 0, fourLegOffsetSequence).y"
+                            data-attr-r="0.5+computeLegTarget(fourLegOffsetData[1], $fourLegOffsetT, 1, 0, 0, fourLegOffsetSequence).z"
+                            data-attr-fill="computeLegTarget(fourLegOffsetData[1], $fourLegOffsetT, 1, 0, 0, fourLegOffsetSequence).z > 0 ? 'none' : fourLegOffsetData[1].color"
                             data-attr-stroke="fourLegOffsetData[1].color" stroke-width="0.25"></circle>
                         <circle
-                            data-attr-cx="fourLegOffsetData[2].xOffset+fourLegOffsetSequence[($fourLegOffsetT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][0]"
-                            data-attr-cy="fourLegOffsetData[2].yOffset+fourLegOffsetSequence[($fourLegOffsetT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][1]"
-                            data-attr-r="0.5+fourLegOffsetSequence[($fourLegOffsetT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][2]"
-                            data-attr-fill="fourLegOffsetSequence[($fourLegOffsetT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][2] > 0 ? 'none' : fourLegOffsetData[2].color"
+                            data-attr-cx="computeLegTarget(fourLegOffsetData[2], $fourLegOffsetT, 1, 0, 0, fourLegOffsetSequence).x"
+                            data-attr-cy="computeLegTarget(fourLegOffsetData[2], $fourLegOffsetT, 1, 0, 0, fourLegOffsetSequence).y"
+                            data-attr-r="0.5+computeLegTarget(fourLegOffsetData[2], $fourLegOffsetT, 1, 0, 0, fourLegOffsetSequence).z"
+                            data-attr-fill="computeLegTarget(fourLegOffsetData[2], $fourLegOffsetT, 1, 0, 0, fourLegOffsetSequence).z > 0 ? 'none' : fourLegOffsetData[2].color"
                             data-attr-stroke="fourLegOffsetData[2].color" stroke-width="0.25"></circle>
                         <circle
-                            data-attr-cx="fourLegOffsetData[3].xOffset+fourLegOffsetSequence[($fourLegOffsetT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][0]"
-                            data-attr-cy="fourLegOffsetData[3].yOffset+fourLegOffsetSequence[($fourLegOffsetT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][1]"
-                            data-attr-r="0.5+fourLegOffsetSequence[($fourLegOffsetT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][2]"
-                            data-attr-fill="fourLegOffsetSequence[($fourLegOffsetT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][2] > 0 ? 'none' : fourLegOffsetData[3].color"
+                            data-attr-cx="computeLegTarget(fourLegOffsetData[3], $fourLegOffsetT, 1, 0, 0, fourLegOffsetSequence).x"
+                            data-attr-cy="computeLegTarget(fourLegOffsetData[3], $fourLegOffsetT, 1, 0, 0, fourLegOffsetSequence).y"
+                            data-attr-r="0.5+computeLegTarget(fourLegOffsetData[3], $fourLegOffsetT, 1, 0, 0, fourLegOffsetSequence).z"
+                            data-attr-fill="computeLegTarget(fourLegOffsetData[3], $fourLegOffsetT, 1, 0, 0, fourLegOffsetSequence).z > 0 ? 'none' : fourLegOffsetData[3].color"
                             data-attr-stroke="fourLegOffsetData[3].color" stroke-width="0.25"></circle>
                     </svg>
                     <button data-on-click="$fourLegOffsetEnabled = !$fourLegOffsetEnabled"><span
@@ -229,28 +260,28 @@
                     <circle r="1" cx="0" cy="0" stroke="light-dark(black, white)" fill="none" stroke-width="0.25">
                     </circle>
                     <circle
-                        data-attr-cx="fourLegOffsetData[0].xOffset+$fourLegSteeringSpeed*Math.cos($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[0].tOffset)%fourLegOffsetSequence.length][0]-Math.sin($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[0].tOffset)%fourLegOffsetSequence.length][1]"
-                        data-attr-cy="fourLegOffsetData[0].yOffset+$fourLegSteeringSpeed*Math.sin($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[0].tOffset)%fourLegOffsetSequence.length][0]+Math.cos($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[0].tOffset)%fourLegOffsetSequence.length][1]"
-                        data-attr-r="0.5+fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[0].tOffset)%fourLegOffsetSequence.length][2]"
-                        data-attr-fill="fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[0].tOffset)%fourLegOffsetSequence.length][2] > 0 ? 'none' : fourLegOffsetData[0].color"
+                        data-attr-cx="computeLegTarget(fourLegOffsetData[0], $fourLegSteeringT, $fourLegSteeringSpeed, $fourLegSteeringAngle, 0, fourLegOffsetSequence).x"
+                        data-attr-cy="computeLegTarget(fourLegOffsetData[0], $fourLegSteeringT, $fourLegSteeringSpeed, $fourLegSteeringAngle, 0, fourLegOffsetSequence).y"
+                        data-attr-r="0.5+computeLegTarget(fourLegOffsetData[0], $fourLegSteeringT, $fourLegSteeringSpeed, $fourLegSteeringAngle, 0, fourLegOffsetSequence).z"
+                        data-attr-fill="computeLegTarget(fourLegOffsetData[0], $fourLegSteeringT, $fourLegSteeringSpeed, $fourLegSteeringAngle, 0, fourLegOffsetSequence).z > 0 ? 'none' : fourLegOffsetData[0].color"
                         data-attr-stroke="fourLegOffsetData[0].color" stroke-width="0.25"></circle>
                     <circle
-                        data-attr-cx="fourLegOffsetData[1].xOffset+$fourLegSteeringSpeed*Math.cos($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[1].tOffset)%fourLegOffsetSequence.length][0]-Math.sin($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[1].tOffset)%fourLegOffsetSequence.length][1]"
-                        data-attr-cy="fourLegOffsetData[1].yOffset+$fourLegSteeringSpeed*Math.sin($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[1].tOffset)%fourLegOffsetSequence.length][0]+Math.cos($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[1].tOffset)%fourLegOffsetSequence.length][1]"
-                        data-attr-r="0.5+fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[1].tOffset)%fourLegOffsetSequence.length][2]"
-                        data-attr-fill="fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[1].tOffset)%fourLegOffsetSequence.length][2] > 0 ? 'none' : fourLegOffsetData[1].color"
+                        data-attr-cx="computeLegTarget(fourLegOffsetData[1], $fourLegSteeringT, $fourLegSteeringSpeed, $fourLegSteeringAngle, 0, fourLegOffsetSequence).x"
+                        data-attr-cy="computeLegTarget(fourLegOffsetData[1], $fourLegSteeringT, $fourLegSteeringSpeed, $fourLegSteeringAngle, 0, fourLegOffsetSequence).y"
+                        data-attr-r="0.5+computeLegTarget(fourLegOffsetData[1], $fourLegSteeringT, $fourLegSteeringSpeed, $fourLegSteeringAngle, 0, fourLegOffsetSequence).z"
+                        data-attr-fill="computeLegTarget(fourLegOffsetData[1], $fourLegSteeringT, $fourLegSteeringSpeed, $fourLegSteeringAngle, 0, fourLegOffsetSequence).z > 0 ? 'none' : fourLegOffsetData[1].color"
                         data-attr-stroke="fourLegOffsetData[1].color" stroke-width="0.25"></circle>
                     <circle
-                        data-attr-cx="fourLegOffsetData[2].xOffset+$fourLegSteeringSpeed*Math.cos($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][0]-Math.sin($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][1]"
-                        data-attr-cy="fourLegOffsetData[2].yOffset+$fourLegSteeringSpeed*Math.sin($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][0]+Math.cos($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][1]"
-                        data-attr-r="0.5+fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][2]"
-                        data-attr-fill="fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][2] > 0 ? 'none' : fourLegOffsetData[2].color"
+                        data-attr-cx="computeLegTarget(fourLegOffsetData[2], $fourLegSteeringT, $fourLegSteeringSpeed, $fourLegSteeringAngle, 0, fourLegOffsetSequence).x"
+                        data-attr-cy="computeLegTarget(fourLegOffsetData[2], $fourLegSteeringT, $fourLegSteeringSpeed, $fourLegSteeringAngle, 0, fourLegOffsetSequence).y"
+                        data-attr-r="0.5+computeLegTarget(fourLegOffsetData[2], $fourLegSteeringT, $fourLegSteeringSpeed, $fourLegSteeringAngle, 0, fourLegOffsetSequence).z"
+                        data-attr-fill="computeLegTarget(fourLegOffsetData[2], $fourLegSteeringT, $fourLegSteeringSpeed, $fourLegSteeringAngle, 0, fourLegOffsetSequence).z > 0 ? 'none' : fourLegOffsetData[2].color"
                         data-attr-stroke="fourLegOffsetData[2].color" stroke-width="0.25"></circle>
                     <circle
-                        data-attr-cx="fourLegOffsetData[3].xOffset+$fourLegSteeringSpeed*Math.cos($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][0]-Math.sin($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][1]"
-                        data-attr-cy="fourLegOffsetData[3].yOffset+$fourLegSteeringSpeed*Math.sin($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][0]+Math.cos($fourLegSteeringAngle)*fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][1]"
-                        data-attr-r="0.5+fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][2]"
-                        data-attr-fill="fourLegOffsetSequence[($fourLegSteeringT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][2] > 0 ? 'none' : fourLegOffsetData[3].color"
+                        data-attr-cx="computeLegTarget(fourLegOffsetData[3], $fourLegSteeringT, $fourLegSteeringSpeed, $fourLegSteeringAngle, 0, fourLegOffsetSequence).x"
+                        data-attr-cy="computeLegTarget(fourLegOffsetData[3], $fourLegSteeringT, $fourLegSteeringSpeed, $fourLegSteeringAngle, 0, fourLegOffsetSequence).y"
+                        data-attr-r="0.5+computeLegTarget(fourLegOffsetData[3], $fourLegSteeringT, $fourLegSteeringSpeed, $fourLegSteeringAngle, 0, fourLegOffsetSequence).z"
+                        data-attr-fill="computeLegTarget(fourLegOffsetData[3], $fourLegSteeringT, $fourLegSteeringSpeed, $fourLegSteeringAngle, 0, fourLegOffsetSequence).z > 0 ? 'none' : fourLegOffsetData[3].color"
                         data-attr-stroke="fourLegOffsetData[3].color" stroke-width="0.25"></circle>
                     <!-- Let's add a line from the center into the direction of travel -->
                     <path
@@ -315,44 +346,60 @@
                 We can also scale the speed by multiplying the offset by the speed.
             </p>
         </section>
-        <!-- <section id="turning">
+        <section id="turning">
             <h2>Turning</h2>
             <p>
-                Presumably we also want to be able to turn, it would be a pretty boring robot if we couldn't do that. So, let's think about how we turn a differential drive robot, the left side and the right side move at different rates. Well, we can vary the speed of all the legs, what would happen if we did that for individual legs?
+                Presumably we also want to be able to turn, it would be a pretty boring robot if we couldn't do that.
+                So, let's think about how we turn a differential drive robot, the left side and the right side move at
+                different rates. Well, we can vary the speed of all the legs, what would happen if we did that for
+                individual legs?
             </p>
+            <p>
+                Unfortunately, this is a bit more complicated because we do care about where the leg is in relation to
+                the desired translation and this requires a bit of math.
+            </p>
+            <p>We're going to use the angle between the leg and the steering vector (which is just a line pointing in
+                the direction we want to turn) to compute if the leg is on the inside or the outside of the robot for
+                the desired turn. Then simply add or subtract the desired angular velocity depending on inside or
+                outside.</p>
             <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 10px;"
-                data-signals="{fourLegTurningT: 0, fourLegTurningEnabled: false, fourLegTurningAngle: 3.14, fourLegTurningSpeed: 0}"
+                data-signals="{fourLegTurningT: 0, fourLegTurningEnabled: false, fourLegTurningAngle: 3.14, fourLegTurningSpeed: 0, fourLegTurningSteer: 0}"
                 data-on-interval__duration.200ms="$fourLegTurningEnabled && $fourLegTurningT++">
                 <svg viewBox="-10 -10 20 20" width="200" height="200">
                     <circle r="1" cx="0" cy="0" stroke="light-dark(black, white)" fill="none" stroke-width="0.25">
                     </circle>
                     <circle
-                        data-attr-cx="fourLegOffsetData[0].xOffset+$fourLegTurningSpeed*Math.cos($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[0].tOffset)%fourLegOffsetSequence.length][0]-Math.sin($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[0].tOffset)%fourLegOffsetSequence.length][1]"
-                        data-attr-cy="fourLegOffsetData[0].yOffset+$fourLegTurningSpeed*Math.sin($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[0].tOffset)%fourLegOffsetSequence.length][0]+Math.cos($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[0].tOffset)%fourLegOffsetSequence.length][1]"
-                        data-attr-r="0.5+fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[0].tOffset)%fourLegOffsetSequence.length][2]"
-                        data-attr-fill="fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[0].tOffset)%fourLegOffsetSequence.length][2] > 0 ? 'none' : fourLegOffsetData[0].color"
-                        data-attr-stroke="fourLegOffsetData[0].color" stroke-width="0.25"></circle>
+                        data-attr-cx="computeLegTarget(fourLegOffsetData[0], $fourLegTurningT, $fourLegTurningSpeed, $fourLegTurningAngle, $fourLegTurningSteer, fourLegOffsetSequence).x"
+                        data-attr-cy="computeLegTarget(fourLegOffsetData[0], $fourLegTurningT, $fourLegTurningSpeed, $fourLegTurningAngle, $fourLegTurningSteer, fourLegOffsetSequence).y"
+                        data-attr-r="0.5+computeLegTarget(fourLegOffsetData[0], $fourLegTurningT, $fourLegTurningSpeed, $fourLegTurningAngle, $fourLegTurningSteer, fourLegOffsetSequence).z"
+                        data-attr-fill="computeLegTarget(fourLegOffsetData[0], $fourLegTurningT, $fourLegTurningSpeed, $fourLegTurningAngle, $fourLegTurningSteer, fourLegOffsetSequence).z > 0 ? 'none' : fourLegOffsetData[0].color"
+                        data-attr-stroke="computeLegTarget(fourLegOffsetData[0], $fourLegTurningT, $fourLegTurningSpeed, $fourLegTurningAngle, $fourLegTurningSteer, fourLegOffsetSequence).isRight ? 'purple' : 'green'"
+                        stroke-width="0.25"></circle>
                     <circle
-                        data-attr-cx="fourLegOffsetData[1].xOffset+$fourLegTurningSpeed*Math.cos($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[1].tOffset)%fourLegOffsetSequence.length][0]-Math.sin($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[1].tOffset)%fourLegOffsetSequence.length][1]"
-                        data-attr-cy="fourLegOffsetData[1].yOffset+$fourLegTurningSpeed*Math.sin($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[1].tOffset)%fourLegOffsetSequence.length][0]+Math.cos($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[1].tOffset)%fourLegOffsetSequence.length][1]"
-                        data-attr-r="0.5+fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[1].tOffset)%fourLegOffsetSequence.length][2]"
-                        data-attr-fill="fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[1].tOffset)%fourLegOffsetSequence.length][2] > 0 ? 'none' : fourLegOffsetData[1].color"
+                        data-attr-cx="computeLegTarget(fourLegOffsetData[1], $fourLegTurningT, $fourLegTurningSpeed, $fourLegTurningAngle, $fourLegTurningSteer, fourLegOffsetSequence).x"
+                        data-attr-cy="computeLegTarget(fourLegOffsetData[1], $fourLegTurningT, $fourLegTurningSpeed, $fourLegTurningAngle, $fourLegTurningSteer, fourLegOffsetSequence).y"
+                        data-attr-r="0.5+computeLegTarget(fourLegOffsetData[1], $fourLegTurningT, $fourLegTurningSpeed, $fourLegTurningAngle, $fourLegTurningSteer, fourLegOffsetSequence).z"
+                        data-attr-fill="computeLegTarget(fourLegOffsetData[1], $fourLegTurningT, $fourLegTurningSpeed, $fourLegTurningAngle, $fourLegTurningSteer, fourLegOffsetSequence).z > 0 ? 'none' : fourLegOffsetData[1].color"
                         data-attr-stroke="fourLegOffsetData[1].color" stroke-width="0.25"></circle>
                     <circle
-                        data-attr-cx="fourLegOffsetData[2].xOffset+$fourLegTurningSpeed*Math.cos($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][0]-Math.sin($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][1]"
-                        data-attr-cy="fourLegOffsetData[2].yOffset+$fourLegTurningSpeed*Math.sin($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][0]+Math.cos($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][1]"
-                        data-attr-r="0.5+fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][2]"
-                        data-attr-fill="fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[2].tOffset)%fourLegOffsetSequence.length][2] > 0 ? 'none' : fourLegOffsetData[2].color"
+                        data-attr-cx="computeLegTarget(fourLegOffsetData[2], $fourLegTurningT, $fourLegTurningSpeed, $fourLegTurningAngle, $fourLegTurningSteer, fourLegOffsetSequence).x"
+                        data-attr-cy="computeLegTarget(fourLegOffsetData[2], $fourLegTurningT, $fourLegTurningSpeed, $fourLegTurningAngle, $fourLegTurningSteer, fourLegOffsetSequence).y"
+                        data-attr-r="0.5+computeLegTarget(fourLegOffsetData[2], $fourLegTurningT, $fourLegTurningSpeed, $fourLegTurningAngle, $fourLegTurningSteer, fourLegOffsetSequence).z"
+                        data-attr-fill="computeLegTarget(fourLegOffsetData[2], $fourLegTurningT, $fourLegTurningSpeed, $fourLegTurningAngle, $fourLegTurningSteer, fourLegOffsetSequence).z > 0 ? 'none' : fourLegOffsetData[2].color"
                         data-attr-stroke="fourLegOffsetData[2].color" stroke-width="0.25"></circle>
                     <circle
-                        data-attr-cx="fourLegOffsetData[3].xOffset+$fourLegTurningSpeed*Math.cos($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][0]-Math.sin($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][1]"
-                        data-attr-cy="fourLegOffsetData[3].yOffset+$fourLegTurningSpeed*Math.sin($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][0]+Math.cos($fourLegTurningAngle)*fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][1]"
-                        data-attr-r="0.5+fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][2]"
-                        data-attr-fill="fourLegOffsetSequence[($fourLegTurningT + fourLegOffsetData[3].tOffset)%fourLegOffsetSequence.length][2] > 0 ? 'none' : fourLegOffsetData[3].color"
+                        data-attr-cx="computeLegTarget(fourLegOffsetData[3], $fourLegTurningT, $fourLegTurningSpeed, $fourLegTurningAngle, $fourLegTurningSteer, fourLegOffsetSequence).x"
+                        data-attr-cy="computeLegTarget(fourLegOffsetData[3], $fourLegTurningT, $fourLegTurningSpeed, $fourLegTurningAngle, $fourLegTurningSteer, fourLegOffsetSequence).y"
+                        data-attr-r="0.5+computeLegTarget(fourLegOffsetData[3], $fourLegTurningT, $fourLegTurningSpeed, $fourLegTurningAngle, $fourLegTurningSteer, fourLegOffsetSequence).z"
+                        data-attr-fill="computeLegTarget(fourLegOffsetData[3], $fourLegTurningT, $fourLegTurningSpeed, $fourLegTurningAngle, $fourLegTurningSteer, fourLegOffsetSequence).z > 0 ? 'none' : fourLegOffsetData[3].color"
                         data-attr-stroke="fourLegOffsetData[3].color" stroke-width="0.25"></circle>
                     <path
                         data-attr-d="`M 0 0 L ${3*$fourLegTurningSpeed*Math.cos($fourLegTurningAngle)} ${3*$fourLegTurningSpeed*Math.sin($fourLegTurningAngle)}`"
-                        data-attr-stroke="$fourLegTurningSpeed >= 0 ? 'black' : 'red'"
+                        data-attr-stroke="$fourLegTurningSpeed >= 0 ? 'light-dark(black, white)' : 'red'"
+                        stroke="light-dark(black, white)" opacity=".75" stroke-width=".25" fill="none"></path>
+                    <path
+                        data-attr-d="`M 0 0 L ${$fourLegTurningSteer*$fourLegTurningSpeed*Math.cos($fourLegTurningAngle+Math.PI/2)} ${$fourLegTurningSteer*$fourLegTurningSpeed*Math.sin($fourLegTurningAngle+Math.PI/2)}`"
+                        data-attr-stroke="$fourLegTurningSpeed >= 0 ? 'light-dark(black, white)' : 'red'"
                         stroke="light-dark(black, white)" opacity=".75" stroke-width=".25" fill="none"></path>
                 </svg>
                 <div style="width: 200px">
@@ -365,10 +412,15 @@
                     <input id="direction-input" type="range" data-bind-four-leg-turning-speed min="-1" max="1"
                         step="0.1">
                 </div>
+                <div style="width: 200px">
+                    <label for="direction-input">Steer</label>
+                    <input id="direction-input" type="range" data-bind-four-leg-turning-steer min="-1" max="1"
+                        step="0.1">
+                </div>
                 <button data-on-click="$fourLegTurningEnabled = !$fourLegTurningEnabled"><span
                         data-text="$fourLegTurningEnabled ? 'Stop' : 'Start'"></span> Animation</button>
             </div>
-        </section> -->
+        </section>
     </main>
     <!-- ./ Main -->
 
